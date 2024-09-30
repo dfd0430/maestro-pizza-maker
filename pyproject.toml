@@ -6,12 +6,13 @@ authors = ["Martin Tlapak <martin.tlapak@eon.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.8,<3.12"
+python = "^3.10,<3.12"
 pandas = "^2.0.1"
 pytest = "^6.2.0"
 notebook = "^6.5.4"
 mip = "^1.15.0"
 uuid = "^1.30"
+numpy = "^2.1.1"
 
 
 [tool.poetry.group.dev.dependencies]
