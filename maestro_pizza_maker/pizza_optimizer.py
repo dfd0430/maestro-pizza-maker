@@ -197,6 +197,150 @@ def maximize_taste_penalty_price(
     constraints_ingredients: PizzaConstraintsIngredients,
     lambda_param: float = 0.5,
 ) -> Pizza:
-    # TODO: implement this function (description at the top of the file)
-    # recomendation: use latex notation to describe the suggested model
-    pass
+
+    model = Model()
+
+
+    ingredients = [ingredient for ingredient in PizzaIngredients]
+    ingredients_names = [ingredient.name for ingredient in ingredients]
+
+
+
+    x = [
+        model.add_var(var_type=INTEGER, lb=0, ub=1, name=ingredient)
+        for ingredient in ingredients_names
+    ]
+
+    # obj = Expected_value(taste(pizza)) - lambda * price(pizza), where lambda is a parameter
+    model.objective = xsum(x[i] * np.mean(ingredients[i].tasteval()) for i in range(len(ingredients))) - lambda_param * xsum(x[i] * ingredients[i].value.price for i in range(len(ingredients)))
+
+
+    model += (
+            xsum(x[i] * ingredients[i].value.protein for i in range(len(ingredients)))
+            >= constraints_values.protein.min
+    )
+    model += (
+            xsum(x[i] * ingredients[i].value.protein for i in range(len(ingredients)))
+            <= constraints_values.protein.max
+    )
+
+    # Fat
+    model += (
+            xsum(x[i] * ingredients[i].value.fat.mean() for i in range(len(ingredients)))
+            >= constraints_values.fat.min
+    )
+    model += (
+            xsum(x[i] * ingredients[i].value.fat.mean() for i in range(len(ingredients)))
+            <= constraints_values.fat.max
+    )
+
+
+    model += (
+            xsum(x[i] * ingredients[i].value.carbohydrates for i in range(len(ingredients)))
+            >= constraints_values.carbohydrates.min
+    )
+    model += (
+            xsum(x[i] * ingredients[i].value.carbohydrates for i in range(len(ingredients)))
+            <= constraints_values.carbohydrates.max
+    )
+
+    # Calories
+    model += (
+            xsum(x[i] * ingredients[i].value.calories for i in range(len(ingredients)))
+            >= constraints_values.calories.min
+    )
+    model += (
+            xsum(x[i] * ingredients[i].value.calories for i in range(len(ingredients)))
+            <= constraints_values.calories.max
+    )
+
+
+    model += (
+            xsum(
+                x[i]
+                for i in range(len(ingredients))
+                if ingredients[i].value.type == IngredientType.DOUGH
+            )
+            == constraints_ingredients.dough
+    )
+    model += (
+            xsum(
+                x[i]
+                for i in range(len(ingredients))
+                if ingredients[i].value.type == IngredientType.SAUCE
+            )
+            == constraints_ingredients.sauce
+    )
+    model += (
+            xsum(
+                x[i]
+                for i in range(len(ingredients))
+                if ingredients[i].value.type == IngredientType.CHEESE
+            )
+            == constraints_ingredients.cheese
+    )
+    model += (
+            xsum(
+                x[i]
+                for i in range(len(ingredients))
+                if ingredients[i].value.type == IngredientType.MEAT
+            )
+            == constraints_ingredients.meat
+    )
+    model += (
+            xsum(
+                x[i]
+                for i in range(len(ingredients))
+                if ingredients[i].value.type == IngredientType.VEGETABLE
+            )
+            == constraints_ingredients.vegetables
+    )
+    model += (
+            xsum(
+                x[i]
+                for i in range(len(ingredients))
+                if ingredients[i].value.type == IngredientType.FRUIT
+            )
+            == constraints_ingredients.fruits
+    )
+
+
+    model.optimize()
+
+
+    if model.status != OptimizationStatus.OPTIMAL:
+        raise Exception("The model is not optimal -> likely no solution found (infeasible))")
+
+
+    return Pizza(
+        dough=[
+            ingredients[i]
+            for i in range(len(ingredients))
+            if ingredients[i].value.type == IngredientType.DOUGH and x[i].x == 1
+        ][0],
+        sauce=[
+            ingredients[i]
+            for i in range(len(ingredients))
+            if ingredients[i].value.type == IngredientType.SAUCE and x[i].x == 1
+        ][0],
+        cheese=[
+            ingredients[i]
+            for i in range(len(ingredients))
+            if ingredients[i].value.type == IngredientType.CHEESE and x[i].x == 1
+        ],
+        meat=[
+            ingredients[i]
+            for i in range(len(ingredients))
+            if ingredients[i].value.type == IngredientType.MEAT and x[i].x == 1
+        ],
+        vegetables=[
+            ingredients[i]
+            for i in range(len(ingredients))
+            if ingredients[i].value.type == IngredientType.VEGETABLE and x[i].x == 1
+        ],
+        fruits=[
+            ingredients[i]
+            for i in range(len(ingredients))
+            if ingredients[i].value.type == IngredientType.FRUIT and x[i].x == 1
+        ],
+    )

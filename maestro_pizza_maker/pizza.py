@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 from typing import List, Literal, Optional
-
+import uuid
 from maestro_pizza_maker.ingredients import PizzaIngredients
 import numpy as np
 
@@ -76,10 +76,7 @@ class Pizza:
 
     @property
     def average_fat(self) -> float:
-        # TODO: implement average fat calculation
-        # HINT: check the `PizzaIngredients` class properly, you will find a `fat` property there which is a numpy array representing the drawings from the fat distribution
-        # since fat is a random variable, we will calculate the average fat of the pizza by averaging the fat vectors of the ingredients
-        pass
+        return np.mean(self.fat)
 
     @property
     def carbohydrates(self) -> float:
@@ -91,17 +88,17 @@ class Pizza:
 
     @property
     def name(self) -> str:
-        # TODO: implement name generation, it is purely up to you how you want to do it
-        # (you can use random, you can use some kind of algorithm) - just make sure that
-        # the name is unique.
-        pass
+        return str(hash(str(self)))
 
     @property
     def taste(self) -> np.array:
-        # TODO: implement taste function
-        # The famous fact that taste is subjective is not true in this case. We believe that fat is the most important factor, since fat carries the most flavor.
-        # So we will use the fat vector to calculate the taste of the pizza with the following formula:
-        # taste = 0.05 * fat_dough + 0.2 * fat_sauce + 0.3 * fat_cheese + 0.1 * fat_fruits + 0.3 * fat_meat + 0.05 * fat_vegetables
-        pass
+        taste = (
+            0.05 * self.dough.value.fat
+            + 0.2 * self.sauce.value.fat
+            + 0.3 * sum(cheeses.value.fat for cheeses in self.cheese)
+            + 0.1 * sum(fruit.value.fat for fruit in self.fruits)
+            + 0.3 * sum(meats.value.fat for meats in self.meat)
+            + 0.05 * sum(vegetable.value.fat for vegetable in self.vegetables)
+        )
 
-
+        return taste

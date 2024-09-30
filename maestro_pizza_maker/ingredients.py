@@ -179,6 +179,25 @@ class PizzaIngredients(Enum):
         calories=100.0,
     )
 
+    def tasteval(self):
+        if self.value.type ==IngredientType.DOUGH:
+            return 0.05 * self.value.fat
+        elif self.value.type ==IngredientType.MEAT:
+            return 0.3 * self.value.fat
+        elif self.value.type ==IngredientType.SAUCE:
+            return 0.2 * self.value.fat
+        elif self.value.type ==IngredientType.CHEESE:
+            return 0.3 * self.value.fat
+        elif self.value.type ==IngredientType.FRUIT:
+            return 0.1 * self.value.fat
+        elif self.value.type ==IngredientType.VEGETABLE:
+            return 0.05 * self.value.fat
+
+
+
+
+
+
     # create a dataframes with all ingredients
     @staticmethod
     def get_ingredients_df():
