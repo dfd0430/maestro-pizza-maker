@@ -12,7 +12,6 @@ pytest = "^6.2.0"
 notebook = "^6.5.4"
 mip = "^1.15.0"
 uuid = "^1.30"
-scikit-learn = "^1.5.2"
 
 
 [tool.poetry.group.dev.dependencies]
