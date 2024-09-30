@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 from typing import List, Literal, Optional
-import uuid
+
 from maestro_pizza_maker.ingredients import PizzaIngredients
 import numpy as np
 

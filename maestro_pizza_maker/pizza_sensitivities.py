@@ -1,6 +1,6 @@
 import numpy as np
 from maestro_pizza_maker.pizza_menu import PizzaMenu
-from sklearn.linear_model import LinearRegression
+
 
 
 def menu_sensitivity_protein(menu: PizzaMenu) -> float:
@@ -31,9 +31,12 @@ def menu_sensitivity_fat(menu: PizzaMenu) -> float:
     return build_model(prices, avg_fats)
 
 
-def build_model(prices: [], value: []) -> float:
+def build_model(prices: [], values: []) -> float:
     prices = np.array(prices).reshape(-1, 1)
-    value = np.array(value).reshape(-1, 1)
-    model = LinearRegression()
-    model.fit(value, prices)
-    return model.coef_[0][0]
+    values = np.array(values).reshape(-1, 1)
+
+    X = np.hstack([values, np.ones_like(values)])
+
+    theta = np.linalg.inv(X.T @ X) @ X.T @ prices
+
+    return float(theta[0][0])
